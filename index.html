@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#18233a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<title>古文単語 Master</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#18233a;--muted:#667085;--line:#e5e7eb;--accent:#315efb;--good:#18864b;--bad:#d9485f;--soft:#eef2ff;--shadow:0 10px 30px rgba(24,35,58,.09)}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:920px;margin:auto;padding:18px 16px 90px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.brand{font-weight:900;font-size:22px}.sub{font-size:12px;color:var(--muted)}
+.iconbtn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 11px}
+.view{display:none!important;visibility:hidden!important;pointer-events:none!important}.view.active{display:block!important;visibility:visible!important;pointer-events:auto!important}
+.hero{background:linear-gradient(135deg,#18233a,#315efb);color:#fff;border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+.hero h1{margin:0 0 6px;font-size:28px}.hero p{margin:0;color:#dbe4ff}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:18px}
+.stat{background:rgba(255,255,255,.12);padding:12px;border-radius:16px}.stat b{display:block;font-size:22px}.stat b small{font-size:11px;font-weight:600;opacity:.8;margin-left:2px}.stat span{font-size:11px;color:#dbe4ff}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.action{min-height:92px;text-align:left;border:1px solid var(--line);background:#fff;border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.action b{display:block;font-size:17px;margin-bottom:5px}.action span{color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.toolbar input,.toolbar select{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;flex:1;min-width:150px}
+.btn{border:0;border-radius:13px;padding:11px 15px;font-weight:800}.primary{background:var(--accent);color:#fff}.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}.danger{background:#fff0f2;color:var(--bad)}
+.list{display:flex;flex-direction:column;gap:8px}.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px 14px}
+.word{font-size:19px;font-weight:900}.meta{font-size:12px;color:var(--muted);margin-top:3px}.pill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800;margin-left:5px}.basic{background:#eaf7ef;color:#167143}.standard{background:#eef2ff;color:#3152c8}.advanced{background:#fff2df;color:#9a5a00}
+.study{min-height:65vh;display:flex;flex-direction:column}.study-top{display:flex;justify-content:space-between;align-items:center}.progress{height:7px;background:#e7eaf0;border-radius:99px;overflow:hidden;margin:10px 0 18px}.progress>i{display:block;height:100%;background:var(--accent);width:0}
+.flash{flex:1;display:flex;align-items:center;justify-content:center}.flashcard{width:min(700px,100%);min-height:340px;background:#fff;border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:28px;text-align:center;display:flex;flex-direction:column;justify-content:center;touch-action:pan-y}
+.tagline{font-size:12px;color:var(--muted);margin-bottom:18px}.bigword{font-size:clamp(40px,10vw,72px);font-weight:950;letter-spacing:.02em}.hint{color:var(--muted);margin-top:18px}.answer{margin-top:18px;text-align:left;border-top:1px solid var(--line);padding-top:18px}.meaning{font-size:22px;font-weight:900}.detail{margin-top:8px;color:#475467;line-height:1.7}
+.swipehelp{text-align:center;color:var(--muted);font-size:12px;margin:12px 0}.swipes{display:grid;grid-template-columns:1fr 1fr;gap:10px}.swipebtn{padding:14px;border-radius:16px;border:1px solid var(--line);font-weight:900;background:#fff}.no{color:var(--bad)}.yes{color:var(--good)}
+.settings label{display:block;margin:14px 0 6px;font-weight:800}.settings input,.settings select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.empty{padding:35px;text-align:center;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#18233a;color:#fff;padding:10px 15px;border-radius:999px;font-size:13px;display:none;z-index:20}
+.dots{display:inline-flex;gap:4px;vertical-align:middle;margin-left:6px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.dot.ok{background:#22b455}.dot.ng{background:#e0364f}.dot.none{background:#e5e7eb}
+.recent{margin-top:16px;font-size:12px;color:var(--muted)}
+.qlead{font-size:13px;color:var(--muted);margin-bottom:12px}.qsentence{font-size:clamp(22px,5.5vw,32px);line-height:1.9;font-weight:800;text-align:left}.qsentence.small{font-size:18px;font-weight:700}
+u.ul{text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px;text-decoration-color:var(--accent)}
+.lbl{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:3px}.answord{font-size:24px;font-weight:900}
+.exbox{margin-top:14px;padding:12px 14px;background:#f8f9fc;border-radius:14px;line-height:1.7}
+.allm{margin:6px 0 10px;line-height:1.8}.allm .cur{font-weight:900;color:var(--accent)}
+.wcard{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px 14px}
+.sense{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}.sline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.sno{font-weight:900;color:var(--accent)}.smean{font-weight:800}.sex{font-size:13px;color:#475467;margin-top:3px}
+.checkrow{display:flex!important;align-items:center;gap:8px}.checkrow input{width:auto!important}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}.hero h1{font-size:24px}.flashcard{min-height:380px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div><div class="brand">古文単語 Master <span style="font-size:11px;opacity:.75">v19</span></div><div class="sub">端末保存・弱点自動学習・オフライン対応</div></div>
+  <button class="iconbtn" id="homeBtn">⌂</button>
+</header>
+
+<section id="home" class="view active" aria-hidden="false">
+  <div class="hero">
+    <h1>今日の学習</h1>
+    <p id="todayText">読み込み中…</p>
+    <div class="stats">
+      <div class="stat"><b id="todayCount">0</b><span>今日の進捗(問)</span></div>
+      <div class="stat"><b id="weakCount">0</b><span>弱点問題</span></div>
+      <div class="stat"><b><span id="masteredWords">0</span><small id="totalWords"></small></b><span>習得単語</span></div>
+      <div class="stat"><b><span id="masteredQs">0</span><small id="totalQs"></small></b><span>習得問題</span></div>
+      <div class="stat"><b id="exCount">0</b><span>例文付き問題</span></div>
+      <div class="stat"><b id="allCount">0</b><span>登録単語</span></div>
+    </div>
+  </div>
+  <div class="grid">
+    <button class="action" id="resumeBtn" onclick="resumeStudy()" style="display:none"><b>続きから</b><span>0/0問目から再開</span></button>
+    <button class="action" onclick="startMode('today')"><b>今日の学習</b><span>設定した単語数を優先出題</span></button>
+    <button class="action" onclick="startMode('weak')"><b>苦手問題</b><span>弱点スコアの高い問題から</span></button>
+    <button class="action" onclick="startMode('review')"><b>復習</b><span>最近間違えた語を優先</span></button>
+    <button class="action" onclick="showList()"><b>全単語一覧</b><span>全ての意味を番号付きで表示・成績確認</span></button>
+    <button class="action" onclick="startMode('basic')"><b>基礎だけ</b><span>基礎レベルを集中学習</span></button>
+    <button class="action" onclick="startMode('standard')"><b>標準だけ</b><span>標準レベルを集中学習</span></button>
+    <button class="action" onclick="startMode('advanced')"><b>発展だけ</b><span>発展レベルを集中学習</span></button>
+    <button class="action" onclick="showSettings()"><b>設定・バックアップ</b><span>1日の語数、データ復元など</span></button>
+    <button class="action" onclick="showFeatures()"><b>本アプリの機能</b><span>使い方・出題アルゴリズム・苦手度など</span></button>
+  </div>
+</section>
+
+<section id="study" class="view study" aria-hidden="true">
+  <div class="study-top"><button class="btn ghost" onclick="goHome()">← 戻る</button><b id="modeTitle">学習</b><span id="studyNum">0/0</span></div>
+  <div class="progress"><i id="progressBar"></i></div>
+  <div class="flash">
+    <div class="flashcard" id="flashcard">
+      <div id="front"></div>
+      <div id="answer" class="answer" style="display:none"></div>
+    </div>
+  </div>
+  <div class="swipehelp" id="swipeHelp">右スワイプ＝自信あり　左スワイプ＝自信なし</div>
+  <div class="swipes" id="confidenceBtns">
+    <button class="swipebtn no" onclick="confidence(false)">← 自信なし</button>
+    <button class="swipebtn yes" onclick="confidence(true)">自信あり →</button>
+  </div>
+  <div class="swipes" id="correctBtns" style="display:none">
+    <button class="swipebtn no" onclick="correctness(false)">← 不正解</button>
+    <button class="swipebtn yes" onclick="correctness(true)">正解 →</button>
+  </div>
+</section>
+
+<section id="list" class="view" aria-hidden="true">
+  <button class="btn ghost" onclick="goHome()">← 戻る</button>
+  <h2>全単語一覧</h2>
+  <div class="toolbar">
+    <input id="search" placeholder="単語・意味・品詞で検索">
+    <select id="levelFilter"><option value="">すべての重要度</option><option value="基礎">基礎</option><option value="標準">標準</option><option value="発展">発展</option></select>
+    <select id="masteryFilter"><option value="">全単語</option><option value="mastered">習得</option><option value="unmastered">未習得</option></select>
+  </div>
+  <div id="wordList" class="list"></div>
+</section>
+
+<section id="features" class="view" aria-hidden="true">
+  <button class="btn ghost" onclick="goHome()">← 戻る</button>
+  <h2>本アプリの機能</h2>
+  <div class="card">
+    <h3>1. 問題の形式（v18）</h3>
+    <p>古文の短文が表示され、下線部の単語の「その場面での意味」を答えます。「自信あり／なし」を選ぶと、答え（番号付きの意味）・問題文・現代語訳・出典・その単語の全ての意味が表示され、「正解／不正解」を自己採点します。例文が未登録の意味は、従来どおり単語を見て意味を答える形式で出題されます。</p>
+    <h3>2. 単語と問題</h3>
+    <p>1つの単語に複数の意味（①②…）がある場合、意味ごとに1問ずつ作られます。学習履歴・苦手度・習得判定はすべて「問題」単位で記録します。単語は、すべての意味の問題を習得したときに「習得単語」になります。</p>
+    <h3>3. 直近5回の○（赤・緑）</h3>
+    <p>問題画面と一覧に、直近5回の正誤が左（古い）→右（新しい）の順で並びます。緑＝正解、赤＝不正解、灰色＝まだ記録なし。</p>
+    <h3>4. 苦手度・出題アルゴリズム</h3>
+    <p>苦手度は0〜100。自信なし・不正解で上がり、自信あり・正解で下がり、3秒以上かかると加算されます。苦手度・復習時期・習得間近の問題が優先され、3秒以内に正解した問題はその日は出題されません。</p>
+    <h3>5. 習得判定・3秒ルール</h3>
+    <p>問題を表示してから「自信あり／なし」を選ぶまでが回答時間です。3秒以内の正解を3回連続で達成した問題を「習得済み」とし、習得後およそ7日間は出題しません。不正解や3秒超過で連続回数はリセットされます。</p>
+    <h3>6. 重要度（基礎・標準・発展）</h3>
+    <p>v19で、入試（共通テスト・国公立二次など）での出題されやすさを基準に再分類しました。同じ単語でも意味ごとに重要度が異なる場合があります。一覧・出題モードは意味（問題）単位の重要度で動作します。この分類は出題傾向の一般的な知識をもとにした目安で、特定の統計データそのものではありません。</p>
+    <h3>7. 例文データの追加</h3>
+    <p>設定画面から例文CSVを取り込むと、該当する単語・意味の問題が例文形式に切り替わります。</p>
+    <h3>8. データ保存・オフライン</h3>
+    <p>学習履歴は端末のブラウザー内に保存されます。バックアップの書き出し・復元ができ、v17以前のバックアップも読み込めます。PWAとしてインストールすればオフラインでも使えます。</p>
+  </div>
+</section>
+
+<section id="settings" class="view" aria-hidden="true">
+  <button class="btn ghost" onclick="goHome()">← 戻る</button>
+  <h2>設定・バックアップ</h2>
+  <div class="card settings">
+    <label for="daily">1日の学習語数</label>
+    <input id="daily" type="number" min="1" max="300" value="30">
+    <label for="weakWeight">弱点重視</label>
+    <input id="weakWeight" type="range" min="1" max="5" step="1" value="5">
+    <div class="meta">現在：<span id="weakWeightText">5</span> / 5　（高いほど苦手問題を優先）</div>
+    <label class="checkrow"><input type="checkbox" id="exampleOnly">例文付きの問題だけ出題する</label>
+    <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+    <button class="btn primary" onclick="saveSettings()">設定を保存</button>
+    <button class="btn ghost" onclick="exportBackup()">バックアップを書き出す</button>
+    <button class="btn ghost" onclick="document.getElementById('importFile').click()">バックアップを復元</button>
+    <input id="importFile" type="file" accept=".json" hidden>
+    <button class="btn ghost" onclick="document.getElementById('vocabFile').click()">単語データ(JSON/CSV)を安全に追加・更新</button>
+    <input id="vocabFile" type="file" accept=".json,.csv" hidden>
+    <button class="btn ghost" onclick="document.getElementById('exampleFile').click()">例文データ(CSV)を取り込む</button>
+    <input id="exampleFile" type="file" accept=".csv" hidden>
+    <p class="meta">例文CSVの列：word_id,word,sense_no,ex_no,meaning,sentence,underline,translation,source（同梱の scrape_weblio.py で作成できます）。</p>
+    <p class="meta">既存単語は削除しません。同じIDなら内容だけ更新して学習履歴を引き継ぎます。同じ単語ならIDが違っても統合し、IDが衝突しても既存単語を上書きせず新しいIDを発行します。学習履歴・設定はこの端末のブラウザーに保存します。別端末へ移すときはバックアップを利用してください。</p>
+  </div>
+</section>
+</div>
+<div id="toast" class="toast"></div>
+<script src="app.js?v=19"></script>
+</body>
+</html>
